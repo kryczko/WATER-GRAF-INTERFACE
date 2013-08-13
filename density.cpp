@@ -1,4 +1,4 @@
-/*This analysis code is meant for a single metal-water interface. You NEED the xdatcar file from vasp calculations. Because the headers are different for different versions of vasp, you must just remove the headers and the timestep strings (like direct configuration) from the XDATCAR files. This can be done in vim by simlpy removing the header and then entering in the command ":g/"string here"/d".*/
+/*This analysis code is meant for a single metal-water interface. YOU NEED AN XYZ FILE.*/
 
 #include <iostream>
 #include <fstream>
