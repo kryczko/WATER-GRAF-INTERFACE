@@ -116,20 +116,25 @@ int main()
 	ydens.open("ydensity.dat");
 	zdens.open("zdensity.dat");
 
+	double conversion = 18.0e-6/(6.023e23*1.0e-30); // go to from mol/A^3 to g/cc
+	
+	double xinc = xlat/binsize, yinc = ylat/binsize, zinc = zlat/binsize;
+	double xvolume = xinc*ylat*zlat, yvolume =xlat*yinc*zlat, zvolume = xlat*ylat*zinc;
+
 	for (int i = 0; i < int (xlat/binsize); i ++)
 	{
-		xdens << i*binsize << "\t" << xbin[i]/x.size() << endl;
-		xdens << (i+1)*binsize << "\t" << xbin[i]/x.size() << endl;
+		xdens << i*binsize << "\t" << xbin[i]*conversion/xvolume << endl;
+		xdens << (i+1)*binsize << "\t" << xbin[i]*conversion/xvolume << endl;
 	}
 	for (int i = 0; i < int (ylat/binsize); i ++)
         {
-                ydens << i*binsize << "\t" << ybin[i]/y.size() << endl;
-                ydens << (i+1)*binsize << "\t" << ybin[i]/y.size() << endl;
+                ydens << i*binsize << "\t" << (ybin[i]*conversion)/yvolume << endl;
+                ydens << (i+1)*binsize << "\t" << ybin[i]*conversion/yvolume << endl;
         }
 	for (int i = 0; i < int (zlat/binsize); i ++)
         {
-                zdens << i*binsize << "\t" << zbin[i]/z.size() << endl;
-                zdens << (i+1)*binsize << "\t" << zbin[i]/z.size() << endl;
+                zdens << i*binsize << "\t" << zbin[i]*conversion/zvolume  << endl;
+                zdens << (i+1)*binsize << "\t" << zbin[i]*conversion/zvolume << endl;
         }
 	//###################################################################
 	
