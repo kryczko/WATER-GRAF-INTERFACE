@@ -12,14 +12,14 @@ int main()
 {
 	string infile, atomname;
 	double xlat, ylat, zlat;
-	int nbins, nframes;
+	int nbins, natoms;
 
 	cout << "XYZ file:\n==> ";
 	cin >> infile;
 	cout << "Lattice constants (x y z) in Angstroms:\n==> ";
 	cin >> xlat >> ylat >> zlat;
-	cout << "Number of frames:\n==> ";
-	cin >> nframes;
+	cout << "Number of O atoms:\n==> ";
+	cin >> natoms;
 	cout << "Number of bins:\n==> ";
 	cin >> nbins;
 
@@ -43,6 +43,7 @@ int main()
 			z.push_back(zval);
 		} 
 	}
+	int nframes = x.size() / natoms;
 	//##############################################
 	
 	// Wrap the coordinates
