@@ -11,14 +11,17 @@ using namespace std;
 int main()
 {
 	string infile, atomname;
-	double xlat, ylat, zlat, binsize;
+	double xlat, ylat, zlat;
+	int nbins, nframes;
 
 	cout << "XYZ file:\n==> ";
 	cin >> infile;
 	cout << "Lattice constants (x y z) in Angstroms:\n==> ";
 	cin >> xlat >> ylat >> zlat;
-	cout << "Bin size:\n==> ";
-	cin >> binsize;
+	cout << "Number of frames:\n==> ";
+	cin >> nframes;
+	cout << "Number of bins:\n==> ";
+	cin >> nbins;
 
 	ifstream input;
 	input.open(infile.c_str());
@@ -75,16 +78,17 @@ int main()
 	
 	// declare the bins; set the values to 0
 	//###############################################################################
-	double xbin[int(xlat/binsize)], ybin[int(ylat/binsize)], zbin[int(zlat/binsize)];
-	for (int i = 0; i < int(xlat/binsize); i ++)
+
+	double xbin[nbins], ybin[nbins], zbin[nbins];
+	for (int i = 0; i < nbins; i ++)
 	{
 		xbin[i] = 0;
 	}
-	for (int i = 0; i < int(ylat/binsize); i ++)
+	for (int i = 0; i < nbins; i ++)
         {
                 ybin[i] = 0;
         }
-	for (int i = 0; i < int(zlat/binsize); i ++)
+	for (int i = 0; i < nbins; i ++)
         {
                 zbin[i] = 0;
         }
@@ -92,19 +96,21 @@ int main()
 
 	// write the bins
 	//###################################
+	double xbinsize = xlat/nbins, ybinsize = ylat/nbins, zbinsize = zlat/nbins;
+
 	for (int i = 0; i < x.size(); i ++)
 	{
-		int bin_num = x[i]/binsize;
+		int bin_num = x[i]/xbinsize;
 		xbin[bin_num] ++;
 	}
 	for (int i = 0; i < y.size(); i ++)
         {
-                int bin_num = y[i]/binsize;
+                int bin_num = y[i]/ybinsize;
                 ybin[bin_num] ++;
         }
 	for (int i = 0; i < z.size(); i ++)
         {
-                int bin_num = z[i]/binsize;
+                int bin_num = z[i]/zbinsize;
                 zbin[bin_num] ++;
         }
 	//#####################################
@@ -118,23 +124,23 @@ int main()
 
 	double conversion = 18.0e-6/(6.023e23*1.0e-30); // go to from mol/A^3 to g/cc
 	
-	double xinc = xlat/binsize, yinc = ylat/binsize, zinc = zlat/binsize;
+	double xinc = xlat/nbins, yinc = ylat/nbins, zinc = zlat/nbins;
 	double xvolume = xinc*ylat*zlat, yvolume =xlat*yinc*zlat, zvolume = xlat*ylat*zinc;
 
-	for (int i = 0; i < int (xlat/binsize); i ++)
+	for (int i = 0; i < nbins; i ++)
 	{
-		xdens << i*binsize << "\t" << xbin[i]*conversion/xvolume << endl;
-		xdens << (i+1)*binsize << "\t" << xbin[i]*conversion/xvolume << endl;
+		xdens << i*xbinsize << "\t" << xbin[i]*conversion/(xvolume*nframes) << endl;
+		xdens << (i+1)*xbinsize << "\t" << xbin[i]*conversion/(xvolume*nframes) << endl;
 	}
-	for (int i = 0; i < int (ylat/binsize); i ++)
+	for (int i = 0; i < nbins; i ++)
         {
-                ydens << i*binsize << "\t" << (ybin[i]*conversion)/yvolume << endl;
-                ydens << (i+1)*binsize << "\t" << ybin[i]*conversion/yvolume << endl;
+                ydens << i*ybinsize << "\t" << (ybin[i]*conversion)/(yvolume*nframes) << endl;
+                ydens << (i+1)*ybinsize << "\t" << ybin[i]*conversion/(yvolume*nframes) << endl;
         }
-	for (int i = 0; i < int (zlat/binsize); i ++)
+	for (int i = 0; i < nbins; i ++)
         {
-                zdens << i*binsize << "\t" << zbin[i]*conversion/zvolume  << endl;
-                zdens << (i+1)*binsize << "\t" << zbin[i]*conversion/zvolume << endl;
+                zdens << i*zbinsize << "\t" << zbin[i]*conversion/(zvolume*nframes)  << endl;
+                zdens << (i+1)*zbinsize << "\t" << zbin[i]*conversion/(zvolume*nframes) << endl;
         }
 	//###################################################################
 	
