@@ -37,7 +37,7 @@ int main()
 	// This is the main menu
 	string infile;
 	double xlat, ylat, zlat;
-	int nooa, noha;
+	int nooa, noha, nbins;
 
 	cout << "XYZ file:\n==> ";
 	cin >> infile;
@@ -47,6 +47,8 @@ int main()
 	cin >> nooa;
 	cout << "Number of H atoms:\n==> ";
 	cin >> noha;
+	cout << "Number of bins:\n==> ";
+	cin >> nbins;
 	//____________________________________________
 
 	//_________________________________________________________
@@ -100,7 +102,7 @@ int main()
 	//now lets go through the data frame by frame, get the neighbors, compute 
 	//the vectors and place them into an array/vector.
 	
-	vector <double> angles;
+	vector <double> angles, zcoords;
 
 	for (int i = 0; i < nframes; i ++)
 	{
@@ -145,27 +147,52 @@ int main()
 					
 				}
 			}
-			
-			double newvec = sqrt( xsum*xsum + ysum*ysum + zsum*zsum );
-			
-			// perform the dot product with z hat, the other terms become 0
-			double angle = acos( (zsum)/(newvec) );
-			angles.push_back(angle);
+			if (xsum != 0 && ysum !=0 && zsum !=0)
+			{			
+				double newvec = sqrt( xsum*xsum + ysum*ysum + zsum*zsum );
+				// perform the dot product with z hat, the other terms become 0
+				double angle = acos( (zsum)/(newvec) ) * 57.2957795;
+				angles.push_back(angle);
+				zcoords.push_back(oz[j + i*nooa]);
+			}
 		}
 	}
 	//_____________________________________________________________________________________
 			
-	//____________________________________________________
+	//_________________________________________________________________________
 	//output data to file
 
 	ofstream output;
 	output.open("dipoleangles.dat");
+	double binsize = zlat/nbins, anglesum[nbins];
+	int zbins[nbins];
 	
-	for ( int i = 0; i < angles.size(); i ++)
+	for ( int i = 0; i < nbins; i ++)
 	{
-		output << angles[i] << endl;
+		zbins[i] = 0;
+		anglesum[i] = 0;
+	}	
+
+	for ( int i = 0; i < zcoords.size(); i ++)
+	{
+		int bin_num = zcoords[i]/binsize;
+		zbins[bin_num] ++;
+		anglesum[bin_num] += angles[i];
 	}
-	
+	for (int i = 0; i < nbins; i ++)
+	{
+		if (zbins[i] != 0)
+		{
+			output << i*binsize << "\t" << anglesum[i]/zbins[i] << endl;
+			output << (i+1)*binsize << "\t" << anglesum[i]/zbins[i] << endl;
+		}
+		else
+		{
+			output << i*binsize << "\t" << -1.0 << endl;
+                        output << (i+1)*binsize << "\t" << -1.0 << endl;
+		}
+	}	
+	//________________________________________________________________________
 	input.close();
 	output.close();
 	return 0;
